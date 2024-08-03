@@ -1,5 +1,7 @@
 package common
 
+type QueueChannels map[string]chan string
+
 type QueueName string
 type MessageType string
 type Document map[string]interface{}

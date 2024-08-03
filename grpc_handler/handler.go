@@ -62,7 +62,7 @@ func (gRPC *GqueServer) PushMessage(ctx context.Context,
 		Data:        req.Message,
 	}
 
-	common.IncomeMsgChannel <- newMessage
+	common.AddToIncomeMsgChannel(newMessage)
 
 	response.Data = global_constant.SUCCESS_MSG_PUSH
 
@@ -84,4 +84,28 @@ func (gRPC *GqueServer) BroadcastMessage(ctx context.Context,
 	response.Data = global_constant.SUCCESS_MSG_PUSH
 
 	return response, nil
+}
+
+func (gRPC *GqueServer) ConsumeQueueMessages(req *pb.ConsumerRequest, stream pb.GqueService_ConsumeQueueMessagesServer) error {
+	queueChan, err := services.GetQueueChannel(req.QueueName)
+	fmt.Printf("\n queueChan %v \n", queueChan)
+
+	if err != nil {
+		stream.Context().Done()
+		return nil
+	}
+
+	for {
+		select {
+		case <-stream.Context().Done():
+			// Client has disconnected
+			return nil
+		case message := <-queueChan:
+			if err := stream.Send(&pb.ConsumerMessage{
+				Message: message,
+			}); err != nil {
+				return err
+			}
+		}
+	}
 }

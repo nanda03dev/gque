@@ -25,11 +25,11 @@ func (queue Queue) ToDocument() gnosql_client.Document {
 
 func ToQueueModel(queueDocument gnosql_client.Document) Queue {
 	return Queue{
-		DocId:       GetStringValue(queueDocument, "docId"),
-		Name:        GetStringValue(queueDocument, "name"),
-		Time:        GetValue[int64](queueDocument, "time"),
+		DocId: GetStringValue(queueDocument, "docId"),
+		Name:  GetStringValue(queueDocument, "name"),
+		// Time:        GetValue[int64](queueDocument, "time"),
 		BroadcastId: GetStringValue(queueDocument, "broadcastId"),
-		StatusCode:  GetValue[common.StatusCode](queueDocument, "statusCode"),
+		// StatusCode:  GetStringValue(queueDocument, "statusCode"),
 	}
 }
 

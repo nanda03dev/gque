@@ -9,6 +9,7 @@ import (
 	"github.com/nanda03dev/gque/grpc_handler"
 	pb "github.com/nanda03dev/gque/proto"
 	"github.com/nanda03dev/gque/services"
+	"github.com/nanda03dev/gque/workers"
 	"google.golang.org/grpc"
 )
 
@@ -25,6 +26,8 @@ func main() {
 	config.SetupDatabase()
 
 	AppServices := services.InitializeServices()
+
+	go workers.InitiateWorker()
 
 	go func() {
 		lis, err := net.Listen("tcp", GQUE_PORT)

@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/nanda03dev/gnosql_client"
+	"github.com/nanda03dev/gque/common"
 	"github.com/nanda03dev/gque/global_constant"
 	"github.com/nanda03dev/gque/models"
 )
@@ -12,6 +13,7 @@ type QueueService interface {
 	GetQueueByID(docId string) (models.Queue, error)
 	UpdateQueue(queue models.Queue) error
 	DeleteQueue(docId string) error
+	InitializeChannels() error
 }
 
 type queueService struct {
@@ -56,4 +58,15 @@ func (s *queueService) DeleteQueue(docId string) error {
 	result := s.queueGnoSQL.Delete(docId)
 
 	return result.Error
+}
+
+func (s *queueService) InitializeChannels() error {
+
+	AllQueue, getError := s.GetQueues()
+
+	for _, value := range AllQueue {
+		common.QueueChannelMap[value.Name] = make(chan string)
+	}
+
+	return getError
 }

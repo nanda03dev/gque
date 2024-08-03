@@ -32,10 +32,21 @@ message BroadcastMessageRequest {
     string message = 2;
 }
 
+
+message ConsumerRequest {
+    string queueName = 1;
+}
+
+message ConsumerMessage {
+    string message = 2;
+}
+
 service GqueService {
     rpc CreateQueue(QueueCreateRequest) returns (SuccessResponse);
     rpc CreateBroadcast(BroadcastCreateRequest) returns (SuccessResponse);
 
     rpc PushMessage(PushMessageRequest) returns (SuccessResponse);
     rpc BroadcastMessage(BroadcastMessageRequest) returns (SuccessResponse);
+
+    rpc ConsumeQueueMessages(ConsumerRequest) returns (stream ConsumerMessage);
 }

@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	GqueService_CreateQueue_FullMethodName      = "/proto.GqueService/CreateQueue"
-	GqueService_CreateBroadcast_FullMethodName  = "/proto.GqueService/CreateBroadcast"
-	GqueService_PushMessage_FullMethodName      = "/proto.GqueService/PushMessage"
-	GqueService_BroadcastMessage_FullMethodName = "/proto.GqueService/BroadcastMessage"
+	GqueService_CreateQueue_FullMethodName          = "/proto.GqueService/CreateQueue"
+	GqueService_CreateBroadcast_FullMethodName      = "/proto.GqueService/CreateBroadcast"
+	GqueService_PushMessage_FullMethodName          = "/proto.GqueService/PushMessage"
+	GqueService_BroadcastMessage_FullMethodName     = "/proto.GqueService/BroadcastMessage"
+	GqueService_ConsumeQueueMessages_FullMethodName = "/proto.GqueService/ConsumeQueueMessages"
 )
 
 // GqueServiceClient is the client API for GqueService service.
@@ -33,6 +34,7 @@ type GqueServiceClient interface {
 	CreateBroadcast(ctx context.Context, in *BroadcastCreateRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	PushMessage(ctx context.Context, in *PushMessageRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
 	BroadcastMessage(ctx context.Context, in *BroadcastMessageRequest, opts ...grpc.CallOption) (*SuccessResponse, error)
+	ConsumeQueueMessages(ctx context.Context, in *ConsumerRequest, opts ...grpc.CallOption) (GqueService_ConsumeQueueMessagesClient, error)
 }
 
 type gqueServiceClient struct {
@@ -83,6 +85,39 @@ func (c *gqueServiceClient) BroadcastMessage(ctx context.Context, in *BroadcastM
 	return out, nil
 }
 
+func (c *gqueServiceClient) ConsumeQueueMessages(ctx context.Context, in *ConsumerRequest, opts ...grpc.CallOption) (GqueService_ConsumeQueueMessagesClient, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &GqueService_ServiceDesc.Streams[0], GqueService_ConsumeQueueMessages_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gqueServiceConsumeQueueMessagesClient{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GqueService_ConsumeQueueMessagesClient interface {
+	Recv() (*ConsumerMessage, error)
+	grpc.ClientStream
+}
+
+type gqueServiceConsumeQueueMessagesClient struct {
+	grpc.ClientStream
+}
+
+func (x *gqueServiceConsumeQueueMessagesClient) Recv() (*ConsumerMessage, error) {
+	m := new(ConsumerMessage)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GqueServiceServer is the server API for GqueService service.
 // All implementations must embed UnimplementedGqueServiceServer
 // for forward compatibility
@@ -91,6 +126,7 @@ type GqueServiceServer interface {
 	CreateBroadcast(context.Context, *BroadcastCreateRequest) (*SuccessResponse, error)
 	PushMessage(context.Context, *PushMessageRequest) (*SuccessResponse, error)
 	BroadcastMessage(context.Context, *BroadcastMessageRequest) (*SuccessResponse, error)
+	ConsumeQueueMessages(*ConsumerRequest, GqueService_ConsumeQueueMessagesServer) error
 	mustEmbedUnimplementedGqueServiceServer()
 }
 
@@ -109,6 +145,9 @@ func (UnimplementedGqueServiceServer) PushMessage(context.Context, *PushMessageR
 }
 func (UnimplementedGqueServiceServer) BroadcastMessage(context.Context, *BroadcastMessageRequest) (*SuccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BroadcastMessage not implemented")
+}
+func (UnimplementedGqueServiceServer) ConsumeQueueMessages(*ConsumerRequest, GqueService_ConsumeQueueMessagesServer) error {
+	return status.Errorf(codes.Unimplemented, "method ConsumeQueueMessages not implemented")
 }
 func (UnimplementedGqueServiceServer) mustEmbedUnimplementedGqueServiceServer() {}
 
@@ -195,6 +234,27 @@ func _GqueService_BroadcastMessage_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GqueService_ConsumeQueueMessages_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ConsumerRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GqueServiceServer).ConsumeQueueMessages(m, &gqueServiceConsumeQueueMessagesServer{ServerStream: stream})
+}
+
+type GqueService_ConsumeQueueMessagesServer interface {
+	Send(*ConsumerMessage) error
+	grpc.ServerStream
+}
+
+type gqueServiceConsumeQueueMessagesServer struct {
+	grpc.ServerStream
+}
+
+func (x *gqueServiceConsumeQueueMessagesServer) Send(m *ConsumerMessage) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // GqueService_ServiceDesc is the grpc.ServiceDesc for GqueService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -219,6 +279,12 @@ var GqueService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GqueService_BroadcastMessage_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ConsumeQueueMessages",
+			Handler:       _GqueService_ConsumeQueueMessages_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "proto/gque.proto",
 }

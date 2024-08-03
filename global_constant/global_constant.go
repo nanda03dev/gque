@@ -30,4 +30,5 @@ const (
 	ERROR_WHILE_BINDING_JSON   = "Request JSON binding failed"
 	ERROR_WHILE_UNMARSHAL_JSON = "Request JSON Unmarhsall failed"
 	ERROR_WHILE_MARSHAL_JSON   = "Request JSON Marhsall failed"
+	ERROR_QUEUE_NOT_FOUND      = "Queue not found"
 )
