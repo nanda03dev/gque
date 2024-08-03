@@ -88,7 +88,6 @@ func (gRPC *GqueServer) BroadcastMessage(ctx context.Context,
 
 func (gRPC *GqueServer) ConsumeQueueMessages(req *pb.ConsumerRequest, stream pb.GqueService_ConsumeQueueMessagesServer) error {
 	queueChan, err := services.GetQueueChannel(req.QueueName)
-	fmt.Printf("\n queueChan %v \n", queueChan)
 
 	if err != nil {
 		stream.Context().Done()
