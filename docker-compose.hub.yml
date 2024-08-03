@@ -1,0 +1,10 @@
+version: "3.9"
+name: gque
+services:
+    gque:
+        container_name: "gque"
+        image: nanda03dev/gque:latest
+        ports:
+            - 5456:5456
+        environment:
+            PORT: 5456

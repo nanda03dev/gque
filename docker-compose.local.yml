@@ -1,0 +1,16 @@
+version: "3.9"
+name: gque-local
+services:
+    gque:
+        container_name: "gque-local"
+        image: gque-local
+        build:
+            context: .
+            dockerfile: Dockerfile.local
+        ports:
+            # <<local host port >>:<<container port>>
+            - 5456:5456
+        environment:
+            # Gque server run at 5456
+            PORT: 5456
+            GNOSQL_SERVER: host.docker.internal:5455
