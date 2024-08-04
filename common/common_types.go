@@ -26,7 +26,7 @@ type RequestFilterBodyType struct {
 }
 
 type IncomeMessage struct {
-	Name        string      `json:"name"`
+	QueueName   string      `json:"queueName"`
 	MessageType MessageType `json:"messageType"`
 	Data        string      `json:"data"`
 }

@@ -7,6 +7,7 @@ import (
 
 func InitiateWorker() {
 	go startWorkerWithRecovery(StartIncomingMsgWorker)
+	go startWorkerWithRecovery(StartMsgProducerWorker)
 }
 
 func startWorkerWithRecovery(workerFunc func()) {

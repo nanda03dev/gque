@@ -29,8 +29,6 @@ func (gRPC *GqueServer) CreateQueue(ctx context.Context,
 	var response = &pb.SuccessResponse{
 		Data: result.DocId,
 	}
-	fmt.Printf("response %v", response)
-	fmt.Printf("err %v", err)
 
 	return response, err
 }
@@ -57,7 +55,7 @@ func (gRPC *GqueServer) PushMessage(ctx context.Context,
 	var response = &pb.SuccessResponse{}
 
 	var newMessage = common.IncomeMessage{
-		Name:        req.QueueName,
+		QueueName:   req.QueueName,
 		MessageType: global_constant.MESSAGE_TYPE_QUEUE,
 		Data:        req.Message,
 	}
@@ -74,7 +72,7 @@ func (gRPC *GqueServer) BroadcastMessage(ctx context.Context,
 	var response = &pb.SuccessResponse{}
 
 	var newMessage = common.IncomeMessage{
-		Name:        req.BroadcastName,
+		QueueName:   req.BroadcastName,
 		MessageType: global_constant.MESSAGE_TYPE_BROADCAST,
 		Data:        req.Message,
 	}
@@ -88,7 +86,7 @@ func (gRPC *GqueServer) BroadcastMessage(ctx context.Context,
 
 func (gRPC *GqueServer) ConsumeQueueMessages(req *pb.ConsumerRequest, stream pb.GqueService_ConsumeQueueMessagesServer) error {
 	queueChan, err := services.GetQueueChannel(req.QueueName)
-
+	fmt.Printf("\n queueChan %v , error: %v ", queueChan, err)
 	if err != nil {
 		stream.Context().Done()
 		return nil
