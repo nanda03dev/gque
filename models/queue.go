@@ -24,12 +24,14 @@ func (queue Queue) ToDocument() gnosql_client.Document {
 }
 
 func ToQueueModel(queueDocument gnosql_client.Document) Queue {
+	var statusCode = common.StatusCode(queueDocument["statusCode"].(string))
+
 	return Queue{
 		DocId: GetStringValue(queueDocument, "docId"),
 		Name:  GetStringValue(queueDocument, "name"),
-		// Time:        GetValue[int64](queueDocument, "time"),
+		// Time:        time,
 		BroadcastId: GetStringValue(queueDocument, "broadcastId"),
-		// StatusCode:  GetStringValue(queueDocument, "statusCode"),
+		StatusCode:  statusCode,
 	}
 }
 

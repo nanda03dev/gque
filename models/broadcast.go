@@ -22,11 +22,20 @@ func (broadcast Broadcast) ToDocument() gnosql_client.Document {
 }
 
 func ToBroadcastModel(broadcastDocument gnosql_client.Document) Broadcast {
+	var statusCode = common.StatusCode(broadcastDocument["statusCode"].(string))
+
+	existingQueueNames := broadcastDocument["queueNames"]
+
+	var queueNames = []string{}
+	for _, each := range existingQueueNames.([]interface{}) {
+		queueNames = append(queueNames, each.(string))
+	}
+
 	return Broadcast{
 		DocId:      GetStringValue(broadcastDocument, "docId"),
 		Name:       GetStringValue(broadcastDocument, "name"),
-		StatusCode: GetValue[common.StatusCode](broadcastDocument, "statusCode"),
-		QueueNames: GetValue[[]string](broadcastDocument, "queueNames"),
+		StatusCode: statusCode,
+		QueueNames: queueNames,
 	}
 }
 

@@ -11,7 +11,6 @@ import (
 func StartIncomingMsgWorker() {
 	for {
 		message := <-common.IncomeMsgChannel
-		log.Printf("Message processing and stored %v ", message)
 
 		var messageService = services.AppServices.Message
 		var newMessage = models.Message{
@@ -26,7 +25,6 @@ func StartIncomingMsgWorker() {
 
 		if messageCreateError == nil {
 			MsgProducerChannel <- messageCreateResult
-			log.Printf("Message send to prodcer  %v ", messageCreateResult)
 
 		} else {
 			log.Printf("Message cannot processd and stored %v ", message)
