@@ -27,35 +27,42 @@ func NewQueueService(gnosql *gnosql_client.Database) QueueService {
 }
 
 func (s *queueService) CreateQueue(queue models.Queue) (models.Queue, error) {
-	_, err := s.GetQueueByName(queue.Name)
+	existingEntity, _ := s.GetQueueByName(queue.Name)
 
-	if err == nil {
+	if len(existingEntity.DocId) > 1 {
 		return models.Queue{}, errors.New(global_constant.ERROR_QUEUE_ALREADY_EXISTS)
 	}
 
 	queue.DocId = models.Generate16DigitUUID()
 	queue.StatusCode = global_constant.QUEUE_ACTIVE
-	result := s.queueGnoSQL.Create(queue.ToDocument())
 
-	s.InitializeChannel(queue)
+	_, err := s.queueGnoSQL.Create(queue.ToDocument())
 
-	return queue, result.Error
+	if err == nil {
+		s.InitializeChannel(queue)
+	}
+
+	return queue, err
 }
 
 func (s *queueService) GetQueues() ([]models.Queue, error) {
 
-	result := s.queueGnoSQL.Filter(gnosql_client.MapInterface{})
+	result, err := s.queueGnoSQL.Filter(gnosql_client.MapInterface{})
 	var queues = make([]models.Queue, 0)
+
+	if err != nil {
+		return queues, err
+	}
 
 	for _, document := range result.Data {
 		queues = append(queues, models.ToQueueModel(document))
 	}
-	return queues, result.Error
+	return queues, err
 }
 
 func (s *queueService) GetQueueByID(docId string) (models.Queue, error) {
-	result := s.queueGnoSQL.Read(docId)
-	return models.ToQueueModel(result.Data), result.Error
+	result, err := s.queueGnoSQL.Read(docId)
+	return models.ToQueueModel(result.Data), err
 }
 
 func (s *queueService) GetQueueByName(queueName string) (models.Queue, error) {
@@ -65,10 +72,10 @@ func (s *queueService) GetQueueByName(queueName string) (models.Queue, error) {
 		"name": queueName,
 	}
 
-	result := s.queueGnoSQL.Filter(filter)
+	result, err := s.queueGnoSQL.Filter(filter)
 
-	if result.Error != nil {
-		return models.Queue{}, result.Error
+	if err != nil {
+		return models.Queue{}, err
 	}
 
 	if len(result.Data) > 0 {
@@ -81,18 +88,18 @@ func (s *queueService) GetQueueByName(queueName string) (models.Queue, error) {
 }
 
 func (s *queueService) UpdateQueue(updateQueue models.Queue) error {
-	result := s.queueGnoSQL.Update(updateQueue.DocId, updateQueue.ToDocument())
+	_, err := s.queueGnoSQL.Update(updateQueue.DocId, updateQueue.ToDocument())
 
-	return result.Error
+	return err
 }
 
 func (s *queueService) DeleteQueue(docId string) error {
 	queue, _ := s.GetQueueByID(docId)
 	s.DeleteChannel(queue)
 
-	result := s.queueGnoSQL.Delete(docId)
+	_, err := s.queueGnoSQL.Delete(docId)
 
-	return result.Error
+	return err
 }
 
 func (s *queueService) InitializeChannels() error {

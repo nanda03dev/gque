@@ -21,8 +21,6 @@ func StartIncomingMsgWorker() {
 
 		messageCreateResult, messageCreateError := messageService.CreateMessage(newMessage)
 
-		log.Printf("Message stored %v ", message)
-
 		if messageCreateError == nil {
 			MsgProducerChannel <- messageCreateResult
 

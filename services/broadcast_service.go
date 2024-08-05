@@ -26,34 +26,38 @@ func NewBroadcastService(gnosql *gnosql_client.Database) BroadcastService {
 }
 
 func (s *broadcastService) CreateBroadcast(broadcast models.Broadcast) (models.Broadcast, error) {
-	_, err := s.GetBroadcastByName(broadcast.Name)
+	existingEntity, _ := s.GetBroadcastByName(broadcast.Name)
 
-	if err == nil {
+	if len(existingEntity.DocId) > 1 {
 		return models.Broadcast{}, errors.New(global_constant.ERROR_BROAD_CAST_ALREADY_EXISTS)
 	}
 
 	broadcast.DocId = models.Generate16DigitUUID()
 	broadcast.StatusCode = global_constant.BROADCAST_ACTIVE
-	result := s.broadcastGnoSQL.Create(broadcast.ToDocument())
+	_, err := s.broadcastGnoSQL.Create(broadcast.ToDocument())
 
-	return broadcast, result.Error
+	return broadcast, err
 }
 
 func (s *broadcastService) GetBroadcasts() ([]models.Broadcast, error) {
 
-	result := s.broadcastGnoSQL.Filter(gnosql_client.MapInterface{})
+	result, err := s.broadcastGnoSQL.Filter(gnosql_client.MapInterface{})
 	var broadcasts = make([]models.Broadcast, 0)
+
+	if err != nil {
+		return broadcasts, err
+	}
 
 	for _, document := range result.Data {
 		broadcasts = append(broadcasts, models.ToBroadcastModel(document))
 	}
 
-	return broadcasts, result.Error
+	return broadcasts, nil
 }
 
 func (s *broadcastService) GetBroadcastByID(docId string) (models.Broadcast, error) {
-	result := s.broadcastGnoSQL.Read(docId)
-	return models.ToBroadcastModel(result.Data), result.Error
+	result, err := s.broadcastGnoSQL.Read(docId)
+	return models.ToBroadcastModel(result.Data), err
 }
 
 func (s *broadcastService) GetBroadcastByName(broadcastName string) (models.Broadcast, error) {
@@ -63,10 +67,10 @@ func (s *broadcastService) GetBroadcastByName(broadcastName string) (models.Broa
 		"name": broadcastName,
 	}
 
-	result := s.broadcastGnoSQL.Filter(filter)
+	result, err := s.broadcastGnoSQL.Filter(filter)
 
-	if result.Error != nil {
-		return models.Broadcast{}, result.Error
+	if err != nil {
+		return models.Broadcast{}, err
 	}
 
 	if len(result.Data) > 0 {
@@ -80,13 +84,13 @@ func (s *broadcastService) GetBroadcastByName(broadcastName string) (models.Broa
 }
 
 func (s *broadcastService) UpdateBroadcast(updateBroadcast models.Broadcast) error {
-	result := s.broadcastGnoSQL.Update(updateBroadcast.DocId, updateBroadcast.ToDocument())
+	_, err := s.broadcastGnoSQL.Update(updateBroadcast.DocId, updateBroadcast.ToDocument())
 
-	return result.Error
+	return err
 }
 
 func (s *broadcastService) DeleteBroadcast(docId string) error {
-	result := s.broadcastGnoSQL.Delete(docId)
+	_, err := s.broadcastGnoSQL.Delete(docId)
 
-	return result.Error
+	return err
 }

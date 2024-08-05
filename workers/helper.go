@@ -17,8 +17,9 @@ func GenerateMessages(message models.Message) map[string][]string {
 	}
 
 	if message.MessageType == global_constant.MESSAGE_TYPE_BROADCAST {
-		broadcast, err := services.AppServices.Broadcast.GetBroadcastByName(queueName)
-		if err != nil {
+		broadcast, _ := services.AppServices.Broadcast.GetBroadcastByName(queueName)
+
+		if len(broadcast.DocId) < 1 {
 			log.Printf("Error %v : %v ", broadcast.Name, global_constant.ERROR_BROADCAST_NOT_FOUND)
 		}
 
