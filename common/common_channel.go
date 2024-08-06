@@ -4,7 +4,7 @@ var IncomeMsgChannel chan IncomeMessage
 var QueueChannelMap QueueChannels
 
 func InitializeChannels() {
-	IncomeMsgChannel = make(chan IncomeMessage)
+	IncomeMsgChannel = make(chan IncomeMessage, 100)
 	QueueChannelMap = make(QueueChannels)
 }
 

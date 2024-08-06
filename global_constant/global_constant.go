@@ -35,3 +35,6 @@ const (
 	ERROR_BROADCAST_NOT_FOUND       = "Broadcast not found"
 	ERROR_BROAD_CAST_ALREADY_EXISTS = "Broadcast already exists"
 )
+const (
+	COMMON_QUEUE_SIZE = 100
+)

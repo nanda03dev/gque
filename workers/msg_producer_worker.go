@@ -2,11 +2,12 @@ package workers
 
 import (
 	"github.com/nanda03dev/gque/common"
+	"github.com/nanda03dev/gque/global_constant"
 	"github.com/nanda03dev/gque/models"
 	"github.com/nanda03dev/gque/services"
 )
 
-var MsgProducerChannel chan models.Message = make(chan models.Message)
+var MsgProducerChannel chan models.Message = make(chan models.Message, global_constant.COMMON_QUEUE_SIZE)
 
 func StartMsgProducerWorker() {
 	for {

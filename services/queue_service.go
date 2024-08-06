@@ -114,7 +114,7 @@ func (s *queueService) InitializeChannels() error {
 
 func (s *queueService) InitializeChannel(queue models.Queue) {
 	if common.QueueChannelMap[queue.Name] == nil {
-		common.QueueChannelMap[queue.Name] = make(chan string)
+		common.QueueChannelMap[queue.Name] = make(chan string, global_constant.COMMON_QUEUE_SIZE)
 	}
 }
 
