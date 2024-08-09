@@ -2,7 +2,6 @@ package grpc_handler
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nanda03dev/gque/common"
 	"github.com/nanda03dev/gque/global_constant"
@@ -29,8 +28,6 @@ func (gRPC *GqueServer) CreateQueue(ctx context.Context,
 	var response = &pb.SuccessResponse{
 		Data: result.DocId,
 	}
-	fmt.Printf("response %v", response)
-	fmt.Printf("err %v", err)
 
 	return response, err
 }
@@ -57,12 +54,12 @@ func (gRPC *GqueServer) PushMessage(ctx context.Context,
 	var response = &pb.SuccessResponse{}
 
 	var newMessage = common.IncomeMessage{
-		Name:        req.QueueName,
+		QueueName:   req.QueueName,
 		MessageType: global_constant.MESSAGE_TYPE_QUEUE,
 		Data:        req.Message,
 	}
 
-	common.IncomeMsgChannel <- newMessage
+	common.AddToIncomeMsgChannel(newMessage)
 
 	response.Data = global_constant.SUCCESS_MSG_PUSH
 
@@ -74,7 +71,7 @@ func (gRPC *GqueServer) BroadcastMessage(ctx context.Context,
 	var response = &pb.SuccessResponse{}
 
 	var newMessage = common.IncomeMessage{
-		Name:        req.BroadcastName,
+		QueueName:   req.BroadcastName,
 		MessageType: global_constant.MESSAGE_TYPE_BROADCAST,
 		Data:        req.Message,
 	}
@@ -84,4 +81,26 @@ func (gRPC *GqueServer) BroadcastMessage(ctx context.Context,
 	response.Data = global_constant.SUCCESS_MSG_PUSH
 
 	return response, nil
+}
+
+func (gRPC *GqueServer) ConsumeQueueMessages(req *pb.ConsumerRequest, stream pb.GqueService_ConsumeQueueMessagesServer) error {
+	queueChan, err := services.GetQueueChannel(req.QueueName)
+	if err != nil {
+		stream.Context().Done()
+		return nil
+	}
+
+	for {
+		select {
+		case <-stream.Context().Done():
+			// Client has disconnected
+			return nil
+		case message := <-queueChan:
+			if err := stream.Send(&pb.ConsumerMessage{
+				Message: message,
+			}); err != nil {
+				return err
+			}
+		}
+	}
 }

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+
 	"github.com/nanda03dev/gnosql_client"
 	"github.com/nanda03dev/gque/common"
 )
@@ -24,13 +26,12 @@ func (queue Queue) ToDocument() gnosql_client.Document {
 }
 
 func ToQueueModel(queueDocument gnosql_client.Document) Queue {
-	return Queue{
-		DocId:       GetStringValue(queueDocument, "docId"),
-		Name:        GetStringValue(queueDocument, "name"),
-		Time:        GetValue[int64](queueDocument, "time"),
-		BroadcastId: GetStringValue(queueDocument, "broadcastId"),
-		StatusCode:  GetValue[common.StatusCode](queueDocument, "statusCode"),
-	}
+	entityString, _ := json.Marshal(queueDocument)
+
+	var parsedEntity Queue
+	json.Unmarshal(entityString, &parsedEntity)
+
+	return parsedEntity
 }
 
 var QueueGnosql = gnosql_client.CollectionInput{

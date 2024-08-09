@@ -1,6 +1,8 @@
 package workers
 
 import (
+	"log"
+
 	"github.com/nanda03dev/gque/common"
 	"github.com/nanda03dev/gque/models"
 	"github.com/nanda03dev/gque/services"
@@ -12,10 +14,19 @@ func StartIncomingMsgWorker() {
 
 		var messageService = services.AppServices.Message
 		var newMessage = models.Message{
-			Name:        message.Name,
+			Name:        message.QueueName,
 			MessageType: message.MessageType,
 			Data:        message.Data,
 		}
-		messageService.CreateMessage(newMessage)
+
+		messageCreateResult, messageCreateError := messageService.CreateMessage(newMessage)
+
+		if messageCreateError == nil {
+			MsgProducerChannel <- messageCreateResult
+
+		} else {
+			log.Printf("Message cannot processd and stored %v ", message)
+		}
+
 	}
 }

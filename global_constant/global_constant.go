@@ -27,7 +27,14 @@ const (
 )
 
 const (
-	ERROR_WHILE_BINDING_JSON   = "Request JSON binding failed"
-	ERROR_WHILE_UNMARSHAL_JSON = "Request JSON Unmarhsall failed"
-	ERROR_WHILE_MARSHAL_JSON   = "Request JSON Marhsall failed"
+	ERROR_WHILE_BINDING_JSON        = "Request JSON binding failed"
+	ERROR_WHILE_UNMARSHAL_JSON      = "Request JSON Unmarhsall failed"
+	ERROR_WHILE_MARSHAL_JSON        = "Request JSON Marhsall failed"
+	ERROR_QUEUE_NOT_FOUND           = "Queue not found"
+	ERROR_QUEUE_ALREADY_EXISTS      = "Queue already exists"
+	ERROR_BROADCAST_NOT_FOUND       = "Broadcast not found"
+	ERROR_BROAD_CAST_ALREADY_EXISTS = "Broadcast already exists"
+)
+const (
+	COMMON_QUEUE_SIZE = 100
 )

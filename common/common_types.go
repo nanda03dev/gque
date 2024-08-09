@@ -1,5 +1,7 @@
 package common
 
+type QueueChannels map[string]chan string
+
 type QueueName string
 type MessageType string
 type Document map[string]interface{}
@@ -24,7 +26,7 @@ type RequestFilterBodyType struct {
 }
 
 type IncomeMessage struct {
-	Name        string      `json:"name"`
+	QueueName   string      `json:"queueName"`
 	MessageType MessageType `json:"messageType"`
 	Data        string      `json:"data"`
 }

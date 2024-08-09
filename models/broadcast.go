@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+
 	"github.com/nanda03dev/gnosql_client"
 	"github.com/nanda03dev/gque/common"
 )
@@ -13,6 +15,7 @@ type Broadcast struct {
 }
 
 func (broadcast Broadcast) ToDocument() gnosql_client.Document {
+
 	return gnosql_client.Document{
 		"docId":      broadcast.DocId,
 		"name":       broadcast.Name,
@@ -22,12 +25,12 @@ func (broadcast Broadcast) ToDocument() gnosql_client.Document {
 }
 
 func ToBroadcastModel(broadcastDocument gnosql_client.Document) Broadcast {
-	return Broadcast{
-		DocId:      GetStringValue(broadcastDocument, "docId"),
-		Name:       GetStringValue(broadcastDocument, "name"),
-		StatusCode: GetValue[common.StatusCode](broadcastDocument, "statusCode"),
-		QueueNames: GetValue[[]string](broadcastDocument, "queueNames"),
-	}
+	entityString, _ := json.Marshal(broadcastDocument)
+
+	var parsedEntity Broadcast
+	json.Unmarshal(entityString, &parsedEntity)
+
+	return parsedEntity
 }
 
 var BroadcastGnosql = gnosql_client.CollectionInput{
