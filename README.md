@@ -8,6 +8,7 @@ Gque is a message queue protocol written in Golang that internally uses a NoSQL 
 - **NoSQL Integration**: Stores and retrieves messages and queues from a NoSQL database.
 - **Channel-Based Processing**: Uses Golang channels for asynchronous message handling.
 - **Event-Driven Architecture**: Supports the creation of events that can be broadcast to multiple consumers.
+- **Integration with Gnosql**: Utilize Gnosql for high-performance in-memory data storage.
 
 ## Workflow Overview
 
@@ -17,7 +18,7 @@ Gque is a message queue protocol written in Golang that internally uses a NoSQL 
 
 2. **Processing Incoming Messages**:
    - The **incoming message worker** consumes messages from the incoming message channel.
-   - The message data is stored in a NoSQL database.
+   - The message data is stored in a GnoSQL database.
    - The message is then passed to the **message producer channel**.
 
 3. **Producing Messages**:
