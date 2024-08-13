@@ -1,6 +1,15 @@
 version: "3.9"
 name: gque
 services:
+    gnosql:
+        container_name: "gnosql"
+        image: nanda03dev/gnosql
+        ports:
+            - 5455:5455
+        volumes:
+            - gnosqldb-data:/root/gnosql/db/
+        environment:
+            PORT: 5455
     gque:
         container_name: "gque"
         image: nanda03dev/gque:latest

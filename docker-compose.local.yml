@@ -1,9 +1,17 @@
 version: "3.9"
 name: gque-local
 services:
+    gnosql:
+        container_name: "gnosql"
+        image: nanda03dev/gnosql
+        ports:
+            - 5455:5455
+        volumes:
+            - gnosqldb-data:/root/gnosql/db/
+        environment:
+            PORT: 5455
     gque:
         container_name: "gque-local"
-        image: gque-local
         build:
             context: .
             dockerfile: Dockerfile.local
@@ -13,4 +21,7 @@ services:
         environment:
             # Gque server run at 5456
             PORT: 5456
-            GNOSQL_SERVER: host.docker.internal:5455
+            GNOSQL_SERVER: gnosql:5455
+volumes:
+    gnosqldb-data:
+        name: gnosqldb-data

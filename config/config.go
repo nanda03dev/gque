@@ -24,7 +24,7 @@ func LoadConfig() {
 
 func SetupDatabase() {
 
-	host := os.Getenv("DATABASE_HOST")
+	host := os.Getenv("GNOSQL_SERVER")
 
 	if host == "" {
 		host = "localhost:5455" // default value
