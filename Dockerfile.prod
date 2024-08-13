@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go server
-RUN go build -o gque .
+RUN go build -o gque ./cmd
 
 # # Expose the port that the server listens on
 
