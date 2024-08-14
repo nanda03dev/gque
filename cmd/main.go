@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 
 	"github.com/nanda03dev/gque/common"
 	"github.com/nanda03dev/gque/config"
@@ -13,12 +14,15 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	// Port for gRPC server to listen to
-	GQUE_PORT = ":5456"
+var (
+	GQUE_PORT = "5456"
 )
 
 func main() {
+	if port := os.Getenv("GQUE_PORT"); port != "" {
+		GQUE_PORT = port
+	}
+
 	config.LoadConfig()
 
 	common.InitializeChannels()
@@ -30,7 +34,7 @@ func main() {
 	go workers.InitiateWorker()
 
 	go func() {
-		lis, err := net.Listen("tcp", GQUE_PORT)
+		lis, err := net.Listen("tcp", ":"+GQUE_PORT)
 
 		if err != nil {
 			log.Fatalf("failed connection: %v", err)

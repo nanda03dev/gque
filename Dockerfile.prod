@@ -16,9 +16,5 @@ COPY . .
 # Build the Go server
 RUN go build -o gque ./cmd
 
-# # Expose the port that the server listens on
-
-EXPOSE 5456
-
 # Set the command to run the server when the container starts
 CMD ["./gque"]

@@ -3,13 +3,16 @@ name: gque
 services:
     gnosql:
         container_name: "gnosql"
-        image: nanda03dev/gnosql
+        image: nanda03dev/gnosql:latest
         ports:
+            # <<local host port >>:<<container port>>
+            - 5454:5454
             - 5455:5455
         volumes:
             - gnosqldb-data:/root/gnosql/db/
         environment:
-            PORT: 5455
+            GIN_PORT: 5454
+            GRPC_PORT: 5455
     gque:
         container_name: "gque"
         build:

@@ -23,18 +23,19 @@ func LoadConfig() {
 }
 
 func SetupDatabase() {
+	var GNOSQL_SERVER string
 
-	host := os.Getenv("GNOSQL_SERVER")
-
-	if host == "" {
-		host = "localhost:5455" // default value
+	if uri := os.Getenv("GNOSQL_SERVER"); uri != "" {
+		GNOSQL_SERVER = uri
+	} else {
+		log.Fatalf("GNOSQL_SERVER is not provided")
 	}
 
 	DatabaseName := "gque"
 
 	collections := models.GetAllGnosqlCollections()
 
-	GnoSQLDB = gnosql_client.Connect(host, DatabaseName, true)
+	GnoSQLDB = gnosql_client.Connect(GNOSQL_SERVER, DatabaseName, true)
 	GnoSQLDB.CreateCollections(collections)
 
 	log.Printf("Successfully connected to GNOSQL Database : %v \n", GnoSQLDB.DBName)
