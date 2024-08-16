@@ -25,6 +25,8 @@ services:
             # Gque server run at 5456
             GQUE_PORT: 5456
             GNOSQL_SERVER: gnosql:5455
+        depends_on:
+            - gnosql        
 volumes:
     gnosqldb-data:
         name: gnosqldb-data
