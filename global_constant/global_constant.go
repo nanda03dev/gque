@@ -36,5 +36,5 @@ const (
 	ERROR_BROAD_CAST_ALREADY_EXISTS = "Broadcast already exists"
 )
 const (
-	COMMON_QUEUE_SIZE = 100
+	COMMON_QUEUE_SIZE = 1000000
 )
